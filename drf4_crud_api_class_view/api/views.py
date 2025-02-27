@@ -7,13 +7,16 @@ from rest_framework.renderers import JSONRenderer
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from django.utils.decorators import method_decorator
+from django.views import View
 
-# function based views
 
-# Create your views here.
-@csrf_exempt
-def student_api(request):
-    if request.method == 'GET':
+# class based views
+
+@method_decorator(csrf_exempt, name='dispatch')
+class StudentAPI(View):
+
+    def get(self, request, *args, **kwargs):
         json_data = request.body
         stream = io.BytesIO(json_data)
         python_data = JSONParser().parse(stream)
@@ -30,10 +33,10 @@ def student_api(request):
         serializer = StudentSerializer(all_studs, many=True)
 
         return JsonResponse(serializer.data, safe=False)
-    
 
 
-    if request.method == 'POST':
+
+    def post(self, request, *args, **kwargs):
         json_data = request.body
         stream = io.BytesIO(json_data)
         python_data = JSONParser().parse(stream)
@@ -56,7 +59,7 @@ def student_api(request):
 
 
 
-    if request.method == 'PUT':
+    def put(self, request, *args, **kwargs):
         json_data = request.body
         stream = io.BytesIO(json_data)
         python_data = JSONParser().parse(stream)
@@ -88,8 +91,8 @@ def student_api(request):
         return JsonResponse(serializer.errors, safe=False)
 
 
-    
-    if request.method == 'DELETE':
+
+    def delete(self, request, *args, **kwargs):
         json_data = request.body
         stream = io.BytesIO(json_data)
         python_data = JSONParser().parse(stream)
