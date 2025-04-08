@@ -2,10 +2,20 @@ from rest_framework import serializers
 from .models import Student
 
 
+
+# reusable custom validator
+def can_contain_alphabet_only(value):
+    if not value.isalpha():
+        raise serializers.ValidationError(
+            "This field must contain alphabets only. Numbers and special characters are not allowed."
+        )
+
+
+# student serializer class
 class StudentSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=100)
+    name = serializers.CharField(max_length=100, validators=[can_contain_alphabet_only])
     roll = serializers.IntegerField()
-    city = serializers.CharField(max_length=100)
+    city = serializers.CharField(max_length=100, validators=[can_contain_alphabet_only])
 
     # to create student object
     def create(self, validated_data):
@@ -25,16 +35,20 @@ class StudentSerializer(serializers.Serializer):
         return instance
     
 
-
-
-
-    # field level validation implemenation for the 'roll' field
-
+    # field level validation implementation for the 'roll' field
     def validate_roll(self, value):
         if value >= 200:
             return serializers.ValidationError('Seat Full')
         return value
 
 
+    # object level validation
+    def validate(self, data):
+        name = data['name']     # or, data.get('name')
+        city = data['city']     # or, data.get('city')
 
+        if name.lower() == "sohel" and city.lower() != "dhaka":
+            raise serializers.ValidationError("City must be Dhaka")
     
+        return data
+
