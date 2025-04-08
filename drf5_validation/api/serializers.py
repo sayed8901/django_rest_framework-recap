@@ -38,7 +38,7 @@ class StudentSerializer(serializers.Serializer):
     # field level validation implementation for the 'roll' field
     def validate_roll(self, value):
         if value >= 200:
-            return serializers.ValidationError('Seat Full')
+            raise serializers.ValidationError('Seat Full')
         return value
 
 
